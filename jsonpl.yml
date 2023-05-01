@@ -1,0 +1,31 @@
+config:
+  target: "https://jsonplaceholder.typicode.com/posts"
+  phases:
+    - duration: 2
+      arrivalRate: 2
+      name: Atlillery Test
+  plugins:
+    ensure: {}
+  ensure:
+    thresholds:
+      - http.response_time.p95: 1000
+    conditions:
+      - expression: vusers.failed == 0
+      - expression: "http.request_rate >= 1 and http.response_time.max < 300"
+  payload:
+    - path: "dane_post.csv"
+      fields:
+        - "kol1"
+        - "kol2"
+        - "kol3"
+      order: sequence
+scenarios:
+  - name: Getting a resource
+    flow:
+      - get:
+          url: "{{ target }}"
+      - post:
+          url: "{{ target }}"
+          json:
+            title: "{{ kol1 }}"
+            body: "{{ kol2 }}"
